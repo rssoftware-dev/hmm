@@ -3,25 +3,25 @@ package hmm
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/base64"
 	"fmt"
 )
 
-func Decrypt(keyStr, encryptedStr string) (string, error) {
-	key := []byte(keyStr)
-	encryptedBytes := []byte(encryptedStr)
-	c, err := aes.NewCipher(key)
+func Decrypt(key, encryptedStr string) (string, error) {
+	cipherText, err := base64.URLEncoding.DecodeString(encryptedStr)
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
-	gcm, err := cipher.NewGCM(c)
+	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
-	nonceSize := gcm.NonceSize()
-	nonce, ciphertext := encryptedBytes[:nonceSize], encryptedBytes[nonceSize:]
-	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		return "", nil
+	if len(cipherText) < aes.BlockSize {
+		return "", fmt.Errorf("length of text and block size differs. expected %d got %d", len(cipherText), aes.BlockSize)
 	}
-	return string(plaintext), nil
+	iv := cipherText[:aes.BlockSize]
+	cipherText = cipherText[aes.BlockSize:]
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(cipherText, cipherText)
+	return string(cipherText), nil
 }
