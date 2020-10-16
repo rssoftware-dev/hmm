@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
 	"io"
 )
 
@@ -12,24 +13,16 @@ import (
 //
 // returns the encrypted string or an error.
 func Encrypt(key, data string) (string, error) {
-	text := []byte(data)
-	k := []byte(key)
-
-	c, err := aes.NewCipher(k)
+	c, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return "", err
 	}
-
-	gcm, err := cipher.NewGCM(c)
-	if err != nil {
+	encryptedText := make([]byte, aes.BlockSize+len(data))
+	iv := encryptedText[:aes.BlockSize]
+	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
 		return "", err
 	}
-
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		return "", err
-	}
-
-	encryptedText := gcm.Seal(nonce, nonce, text, nil)
-	return string(encryptedText), err
+	stream := cipher.NewCFBEncrypter(c, iv)
+	stream.XORKeyStream(encryptedText[aes.BlockSize:], []byte(data))
+	return base64.URLEncoding.EncodeToString(encryptedText), nil
 }
