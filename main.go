@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/rssoftware-dev/hmm"
+	"github.com/rssoftware-dev/hmm/secrets"
 )
 
 func main() {
@@ -33,14 +33,14 @@ func main() {
 
 	switch args[0] {
 	case "encrypt":
-		data, err := hmm.Encrypt(args[1], args[2])
+		data, err := secrets.Encrypt(args[1], args[2])
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println(data)
 		return
 	case "decrypt":
-		data, err := hmm.Decrypt(args[1], args[2])
+		data, err := secrets.Decrypt(args[1], args[2])
 		if err != nil {
 			log.Fatal(err)
 		}

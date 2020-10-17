@@ -1,4 +1,4 @@
-package hmm
+package secrets
 
 import (
 	"crypto/aes"
