@@ -3,7 +3,7 @@ package hmm_test
 import (
 	"testing"
 
-	"github.com/rssoftware/hmm"
+	"github.com/rssoftware-dev/hmm"
 )
 
 func TestEncryption(t *testing.T) {

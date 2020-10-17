@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/rssoftware/hmm"
+	"github.com/rssoftware-dev/hmm"
 )
 
 func main() {
